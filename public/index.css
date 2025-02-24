@@ -18,6 +18,18 @@ button {
     min-width: 100px;
 }
 
+th {
+    width: 200px;
+    padding-left: 5px;
+    padding-right: 5px;
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+th img {
+    width:100%
+}
+
 .redText {
     color: red;
     text-align: center;

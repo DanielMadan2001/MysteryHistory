@@ -29,6 +29,13 @@
                 A social game where a group of 3-12 players submit an array of facts about themselves and subsequently try to guess who submitted each set over the course of several rounds.
                 Points are awarded based on how fast each player is able to correctly guess who submitted the current series of facts.
             </p>
+            <table style="margin: auto;">
+                <tr>
+                    <th id="screenshot1" onclick="unityScreenshotClick(1)"> <img src="images/unityScreenshot1.png"> </a> </th>
+                    <th id="screenshot2" onclick="unityScreenshotClick(2)"> <img src="images/unityScreenshot2.png"> </a> </th>
+                    <th id="screenshot3" onclick="unityScreenshotClick(3)"> <img src="images/unityScreenshot3.png"> </a> </th>
+                </tr>
+            </table>
             <h2> How to play </h2>
             <p> Use the following steps to set up the game on your device: </p>
             <ol>
@@ -48,6 +55,10 @@
 
             const redTextDiv = document.getElementById("redText");
 
+            const unityScreenshot1 = document.getElementById("screenshot1");
+            const unityScreenshot2 = document.getElementById("screenshot2");
+            const unityScreenshot3 = document.getElementById("screenshot3");
+
             function joinButton() {
                 console.log('playerName ' + nameInput.value);
                 console.log('joinRoom ' + serverIDInput.value);
@@ -56,6 +67,17 @@
             function redTextToggle(on) {
                 if (on) { redTextDiv.innerHTML = `<p> No server with this ID could be found </p>`; }
                 else    { redTextDiv.innerHTML = ``; }
+            }
+
+            function unityScreenshotClick(index) {
+                if (index == 1) { unityScreenshot1.style.width = "500px"; }
+                else            { unityScreenshot1.style.width = "150px"; }
+
+                if (index == 2) { unityScreenshot2.style.width = "500px"; }
+                else            { unityScreenshot2.style.width = "150px"; }
+
+                if (index == 3) { unityScreenshot3.style.width = "500px"; }
+                else            { unityScreenshot3.style.width = "150px"; }
             }
 
             redTextToggle(false);
