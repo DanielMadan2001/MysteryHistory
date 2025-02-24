@@ -11,15 +11,55 @@
 <body>
     <div class="bodyDiv">
         <h1> MYSTERY HISTORY </h1>
-        <h2> Made by  <a href = "https://danielmadan2001.github.io/">Daniel Madan</a> </h2>
-        <div style="width: 30%; min-width: 225px; margin-left: 20%; float: left;">
+        <h2> Made by  <a href = "https://danielmadan2001.github.io/" target="_blank">Daniel Madan</a> </h2>
+        <div style="width: 30%; margin-left: 20%; float: left;">
             <input id="playerName" placeholder="Name" type="text" style="width: 90%;"> </input>
         </div>
         <div style="width: 30%; float: left;">
-            <input id="serverID" placeholder="Enter server ID" type="text" style="width: 60%;">
+            <input id="serverID" placeholder="Server ID" type="text" style="width: 55%; min-width: 100px; font-size: 1.05em;">
             <br><br>
-            <button id="submitButton">Join Server</button>
+            <button onclick="joinButton()">Join Server</button>
         </div>
+        <br><br><br><br><br><br><br>
+        <div id="redText" class="redText"></div>
+        <hr>
+        <div>
+            <h2> What is Mystery History? </h2>
+            <p>
+                A social game where a group of 3-12 players submit an array of facts about themselves and subsequently try to guess who submitted each set over the course of several rounds.
+                Points are awarded based on how fast each player is able to correctly guess who submitted the current series of facts.
+            </p>
+            <h2> How to play </h2>
+            <p> Use the following steps to set up the game on your device: </p>
+            <ol>
+                <li> On the device that you would like to host the game with, <a href = "https://danielmadan2001.itch.io/mystery-history" target="_blank">click here to go to the game's itch.io page.</a> 
+                    Click play and begin a session to have the game create a room for you.</li>
+                <li> From this website, all players will set their names and join the room using the displayed room ID. 
+                    Once every player has joined the room, click the <i>Continue</i> button.
+                </li>
+                <li> Wait for every player who submit at least 10 facts about themselves with the specified requirements.
+                    When every player has submitted their facts, click the <i>Start</i> button. </li>
+            </ol>
+        </div>
+
+        <script>
+            const nameInput = document.getElementById("playerName");
+            const serverIDInput = document.getElementById("serverID");
+
+            const redTextDiv = document.getElementById("redText");
+
+            function joinButton() {
+                console.log('playerName ' + nameInput.value);
+                console.log('joinRoom ' + serverIDInput.value);
+            }
+
+            function redTextToggle(on) {
+                if (on) { redTextDiv.innerHTML = `<p> No server with this ID could be found </p>`; }
+                else    { redTextDiv.innerHTML = ``; }
+            }
+
+            redTextToggle(false);
+        </script>
     </div>
 </body>
 </html>
