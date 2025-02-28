@@ -26,10 +26,16 @@ li {
     line-height: 1.25;
 }
 
-input {
+input, textarea {
     font-size: 1.5em;
     border-radius: 5px;
     font-family: "Lucida Console", Monaco, monospace;
+    resize: none;
+}
+
+textarea {
+    border-color: black;
+    border-width: 3px;
 }
 
 .bodyDiv {    

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit your Facts - Mystery History</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href="factSubmission.css" />
+    <link rel="icon" href="images/icon.png">
+</head>
+<body>
+    <div class="bodyDiv">
+        <h1>Submit your Facts!</h1>
+        <div id="easyFactsText" class="factsLeftDiv"> </div>
+        <div id="medFactsText" class="factsLeftDiv"> </div>
+        <div id="hardFactsText" class="factsLeftDiv"> </div>
+        <br>
+    
+        <div id="factsDiv" class="factsDiv"> </div>
+    
+        <div id="submissionDiv" class="submissionDiv">
+            <textarea id="factContents" placeholder="Write your fact here!" type="text" style="width: 90%; height: 60px; padding: 2%; font-size: 1.05em;"></textarea>
+            <h4> Difficulty:</h4>
+            <div id="difficultyButtons" class="difficultyButtons"> 
+                <!-- <p id="difficultyButton1"> 1 </p> -->
+            </div>
+            <button id="submitNewFact" class="submitNewFact">Submit</button>
+            <br>
+            <h3 style="margin-bottom: 0px;"> Need some help? </h3>
+            <p> Here are a few examples of questions you could use! </p>
+            <div id="exampleFacts"></div>
+        </div>
+    </div>
+
+    <script type="module">
+
+        const easyFactsText = document.getElementById("easyFactsText");
+        const medFactsText = document.getElementById("medFactsText");
+        const hardFactsText = document.getElementById("hardFactsText");
+
+        const factsDiv = document.getElementById("factsDiv");
+
+        const exampleFactsDiv = document.getElementById("exampleFacts");
+        const factContents = document.getElementById("factContents");
+
+        const difficultyButtons = document.getElementById("difficultyButtons");
+        document.getElementById("submitNewFact").onclick = function () { submitNewFact(); };
+
+        const playerValue = getQueryParam('p');
+        var roomID = getQueryParam('r');
+        
+        var currentDifficulty = -1;
+        const factsList = [
+        ];
+
+        // WEBSOCKET ////////////////////////////////////////////////////
+
+        const ws = new WebSocket("ws://localhost:8080");    // https://mystery-history-9d9aa246ca8c.herokuapp.com
+                                                            // ws://localhost:8080
+        
+        ws.onopen = function() {
+            console.log("Connected to WebSocket server");
+            roomID = getQueryParam('r');
+            ws["room"] = roomID;
+            console.log(ws["room"]);
+            console.log(typeof(ws["room"]));
+
+            const message = { type: "connection", source: "HTML", pageIndex: 1, "roomID": roomID };
+            ws.send(JSON.stringify(message));
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            switch (data.type) {
+                case ("redirect"):
+                        window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
+                        break;
+                default:
+                    console.log(data.type);
+                    break;
+            }
+        };
+
+        ws.onerror = function(error) {
+            console.error("WebSocket Error: " + error);
+        };
+
+        ws.onclose = function() {
+            console.log("WebSocket connection closed");
+        };
+
+        // OTHER ////////////////////////////////////////////////////////
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // FACTS DIV ////////////////////////////////////////////////////////
+
+        function factsUpdate() {
+            factsDiv.innerHTML = ``;
+            if (factsList.length == 0) {
+                const text = document.createElement('article');
+                text.innerHTML = `<p> You have no facts submitted yet...</p>`;
+                factsDiv.append(text);
+            }
+            else {
+                for (let i = 0; i < factsList.length / 2; i++) {
+                    const newDiv = document.createElement('article');
+                    newDiv.classList.add("factsItemDiv");
+
+                    if (factsList[(2 * i) + 1] < 4)      { newDiv.style = "background-color: #ffff99;"; }
+                    else if (factsList[(2 * i) + 1] < 8) { newDiv.style = "background-color: #ff9999;"; }
+                    else                                 { newDiv.style = "background-color: #cc99ff;"; }
+
+                    const leftSide = document.createElement('article');
+                    leftSide.classList.add("factsItemDivLeft");
+                    leftSide.innerHTML = `<img src="images/x.png" class="factItemX" title="Delete fact">`;
+                    leftSide.addEventListener("click", (event) => {
+                        // console.log("bruh");
+                        factsList.splice(2 * i, 2);
+                        factsUpdate();
+                    });
+
+                    const rightSide = document.createElement('article');
+                    rightSide.classList.add("factsItemDivRight");
+                    rightSide.innerHTML = `<p> ${factsList[2 * i]} </p>`;
+
+                    // const rightSide = document.createElement('article');
+                    // rightSide.classList.add("factsItemDivRight");
+                    // rightSide.innerHTML = `<p> Test </p>`;
+
+                    // const xButton = document.createElement('article');
+                    // xButton.innerHTML = `<img src="images/x.png" class="factItemX" title="Delete fact">`;
+
+                    // xButton.addEventListener("click", (event) => {
+                    //     // console.log("bruh");
+                    //     factsList.splice(2 * i, 2);
+                    //     factsUpdate();
+                    // });
+                    
+                    // newDiv.append(xButton);
+                    // newDiv.innerHTML += `<p> ${factsList[2 * i]} </p>`;
+                
+                    newDiv.append(leftSide);
+                    newDiv.append(rightSide);
+                    factsDiv.append(newDiv);
+                }
+            }
+            
+            factsLeftTexts();
+        }
+
+        function newFactsButton(contents, difficulty) {
+            // const newExample = document.createElement('article');
+        }
+
+        function factsLeftTexts() {
+            var easyFacts = 0;
+            var medFacts = 0;
+            var hardFacts = 0;
+
+            if (easyFacts < 3) {
+                var text = `Need at least `;
+                text += `<span style="color: #878700">${3 - easyFacts} more easy `;
+                if ((3 - easyFacts) == 1) { text += `fact`; }
+                else                      { text += `facts`; }
+                text += `</span>.`;
+                easyFactsText.innerHTML = text;
+            }
+            else { easyFactsText.innerHTML = ``; }
+
+            if (medFacts < 4) {
+                var text = `Need at least `;
+                text += `<span style="color: #870000">${4 - medFacts} more medium `;
+                if ((4 - medFacts) == 1) { text += `fact`; }
+                else                      { text += `facts`; }
+                text += `</span>.`;
+                medFactsText.innerHTML = text;
+            }
+            else { medFactsText.innerHTML = ``; }
+
+            if (hardFacts < 4) {
+                var text = `Need at least `;
+                text += `<span style="color: #4B0087">${3 - hardFacts} more hard `;
+                if ((3 - hardFacts) == 1) { text += `fact`; }
+                else                      { text += `facts`; }
+                text += `</span>.`;
+                hardFactsText.innerHTML = text;
+            }
+            else { hardFactsText.innerHTML = ``; }
+        }
+
+        // SUBMISSION DIV ////////////////////////////////////////////////////////
+
+        function setDifficultyButtons() {
+            difficultyButtons.innerHTML = ``;
+            for (let i = 0; i < 10; i++) {
+                const newButton = document.createElement('article');
+                newButton.classList.add("difficultyButtonsChild");
+
+                newButton.innerHTML = `<p>${i + 1}</p>`;
+                if (i < 3)      
+                {
+                    if (i == currentDifficulty) { newButton.style = "background-color: #ffff66;"; }
+                    else                        { newButton.style = "background-color: #ffff99;"; }
+                }
+                else if (i < 7) 
+                { 
+                    if (i == currentDifficulty) { newButton.style = "background-color: #ff4d4d;"; }
+                    else                        { newButton.style = "background-color: #ff9999;"; }
+                }
+                else            
+                { 
+                    if (i == currentDifficulty) { newButton.style = "background-color: #a64dff;"; }
+                    else                        { newButton.style = "background-color: #cc99ff;"; }
+                }
+
+                newButton.onclick = function () { updateCurrentDifficulty(i); };
+
+                difficultyButtons.append(newButton);
+            }
+        }
+
+        function updateCurrentDifficulty(newCurrentDifficulty = -1) {
+            currentDifficulty = newCurrentDifficulty;
+            setDifficultyButtons();
+        }
+
+        function submitNewFact() {
+            if (factContents.value.length == 0 || currentDifficulty == -1) { return; }
+
+            factsList.push(factContents.value);
+            factsList.push(currentDifficulty);
+            factsUpdate();
+
+            factContents.value = "";
+            updateCurrentDifficulty();
+
+            console.log(factsList);
+
+            // const message = { type: "factUpdate", theRoomID: roomID };
+            // ws.send(JSON.stringify(message));
+
+            // factsDiv.innerHTML = ``;
+            // for (const [key, value] of Object.entries(factsList)) {
+
+            // }
+        }
+
+        function submissionExamples() {
+            const examples = document.createElement('div');
+
+            // FAVORITES
+            examples.append(newSubmissionExample("My favorite show is ____."));
+            examples.append(newSubmissionExample("My favorite movie is ____."));
+            examples.append(newSubmissionExample("My favorite actor is ____."));
+            examples.append(newSubmissionExample("My favorite food is ____."));
+            examples.append(newSubmissionExample("My favorite beverage is ____."));
+            examples.append(newSubmissionExample("My favorite school subject is ____."));
+            examples.append(newSubmissionExample("My least favorite subject is ____."));
+            // SKILLS
+            examples.append(newSubmissionExample("I speak ____ fluently."));
+            examples.append(newSubmissionExample("I have completely memorized ____."));
+            examples.append(newSubmissionExample("I could sing ____ from memory."));
+            // PREFERENCES
+            examples.append(newSubmissionExample("My personal theme song would be ____."));
+            examples.append(newSubmissionExample("If I won the lottery, I'd ____."));
+            examples.append(newSubmissionExample("If I had a superpower, it'd be ____."));
+            examples.append(newSubmissionExample("I ____ pineapple on pizza."));
+            // EXPERIENCES
+            examples.append(newSubmissionExample("I have a pet ____."));
+            examples.append(newSubmissionExample("I have ____ siblings."));
+            examples.append(newSubmissionExample("I have broken my ____ before."));
+            examples.append(newSubmissionExample("I've worked at a ____ before."));
+            examples.append(newSubmissionExample("I have a ____ license."));
+            examples.append(newSubmissionExample("I once won ____."));
+            examples.append(newSubmissionExample("I've seen ____ live."));
+            examples.append(newSubmissionExample("I've met ____ at a convention."));
+            examples.append(newSubmissionExample("My childhood fear was ____."));
+            examples.append(newSubmissionExample("I ripped my pants while ____."));
+            examples.append(newSubmissionExample("I've done ____ in a talent show."));
+            examples.append(newSubmissionExample("I've competed in ____."));
+            examples.append(newSubmissionExample("I have a tattoo of ____."));
+            examples.append(newSubmissionExample("I have(n't) skipped school before."));
+            examples.append(newSubmissionExample("A cop has pulled me over for ____."));
+            // PERSONAL
+            examples.append(newSubmissionExample("People say I resemble ____."));
+            examples.append(newSubmissionExample("____ is what got me into playing video games."));
+            examples.append(newSubmissionExample("My biggest pet peeve is ____."));
+            examples.append(newSubmissionExample("The sport I'm best at is ____."));
+            examples.append(newSubmissionExample("My guilty pleasure is ____."));
+
+            return examples;
+        }
+
+        function newSubmissionExample(contents = "") {
+            const newExample = document.createElement('article');
+            newExample.classList.add("exampleSubmissionDiv");
+
+            const newButton = document.createElement('article');
+            newButton.innerHTML = `
+                <a href = "#factContents"> <button class="exampleSubmissionButton">
+                    ${contents}
+                </button> </a>`;
+
+            newButton.addEventListener("click", (event) => {
+                factContents.value = newButton.innerText;
+            });
+
+            newExample.append(newButton);
+            return newExample;
+        }
+
+        factsUpdate();
+        setDifficultyButtons();
+        exampleFactsDiv.append(submissionExamples());
+
+        console.log("Player number: " + playerValue);
+        console.log("Room ID: " + roomID);
+    </script>
+</body>
+</html>

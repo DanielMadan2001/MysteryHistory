@@ -18,7 +18,7 @@
         <div style="width: 30%; float: left;">
             <input id="serverID" placeholder="Server ID" type="text" style="width: 55%; min-width: 100px; font-size: 1.05em;">
             <br><br>
-            <button onclick="joinButton()">Join Server</button>
+            <button id="joinButton">Join Server</button>
         </div>
         <br><br><br><br><br><br><br>
         <div id="redText" class="redText"></div>
@@ -31,7 +31,7 @@
             </p>
             <table style="margin: auto;">
                 <tr>
-                    <th id="screenshot1" onclick="unityScreenshotClick(1)"> <img src="images/unityScreenshot1.png"> </a> </th>
+                    <th id="screenshot1"> <img src="images/unityScreenshot1.png"> </a> </th>
                     <th id="screenshot2" onclick="unityScreenshotClick(2)"> <img src="images/unityScreenshot2.png"> </a> </th>
                     <th id="screenshot3" onclick="unityScreenshotClick(3)"> <img src="images/unityScreenshot3.png"> </a> </th>
                 </tr>
@@ -49,19 +49,69 @@
             </ol>
         </div>
 
-        <script>
+        <script type="module">
+            // import NewWebsocket from "./websocket.js";
+
             const nameInput = document.getElementById("playerName");
             const serverIDInput = document.getElementById("serverID");
+
+            document.getElementById("joinButton").onclick = function () { joinButton(); };
 
             const redTextDiv = document.getElementById("redText");
 
             const unityScreenshot1 = document.getElementById("screenshot1");
+            unityScreenshot1.onclick = function () { unityScreenshotClick(1); };
             const unityScreenshot2 = document.getElementById("screenshot2");
+            unityScreenshot2.onclick = function () { unityScreenshotClick(2); };
             const unityScreenshot3 = document.getElementById("screenshot3");
+            unityScreenshot3.onclick = function () { unityScreenshotClick(3); };
+
+            // WEBSOCKET ////////////////////////////////////////////////////
+            
+            const ws = new WebSocket("ws://localhost:8080");
+            
+            ws.onopen = function() {
+                console.log("Connected to WebSocket server");
+
+                const message = { type: "connection", source: "HTML", pageIndex: 0 };
+                ws.send(JSON.stringify(message));
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+
+                switch (data.type) {
+                    case ("toggleRedText"):
+                        redTextToggle(true);
+                        break;
+                    case ("redirect"):
+                        window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
+                        break;
+                    default:
+                        console.log(data.type);
+                        break;
+                }
+            };
+
+            ws.onerror = function(error) {
+                console.error("WebSocket Error: " + error);
+            };
+
+            ws.onclose = function() {
+                console.log("WebSocket connection closed");
+            };
+
+            // OTHER ////////////////////////////////////////////////////////
 
             function joinButton() {
-                console.log('playerName ' + nameInput.value);
-                console.log('joinRoom ' + serverIDInput.value);
+                const message = 
+                { 
+                    type: "joinRoom", 
+                    playerName: nameInput.value, 
+                    roomID: serverIDInput.value, 
+                    source: "HTML" 
+                };
+                ws.send(JSON.stringify(message));
             }
 
             function redTextToggle(on) {
