@@ -6,6 +6,10 @@ p {
     line-height: 1.25;
 }
 
+tr {
+    width: 100%;
+}
+
 h1 {
     text-align: center;
     font-style: bold;

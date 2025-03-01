@@ -1,0 +1,33 @@
+p {
+    padding-top: 5px;
+    margin-bottom: 0px;
+}
+
+table {
+    width: 100%;
+    text-align: center;
+}
+
+.bodyDiv {
+    width: 90%;
+    min-width: 425px;
+}
+
+.playerButton {
+    cursor: pointer;
+    width: 80%;
+    min-width: 400px;
+    height: 50px;
+    margin: auto;   
+    margin-bottom: 10px;
+    border: 3px solid black;
+    border-radius: 5px;
+    font-size: 1.25em;
+}
+
+.playerButton:hover {
+    width: 85%;
+    height: 55px;
+    min-width: 405px;
+    font-size: 1.35em;
+}

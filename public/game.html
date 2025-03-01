@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit your Facts - Mystery History</title>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css" />
+    <link rel="stylesheet" type="text/css" href="game.css" />
+    <link rel="icon" href="images/icon.png">
+</head>
+<body>
+    <div class="bodyDiv">
+        <h2> Who do you think submitted these facts? </h2>
+        <table id="buttonsDiv">
+            <tr> <th> 
+                <p class="playerButton"> Test </p>
+                <p class="playerButton"> Test </p>
+            </th> </tr>
+            <tr> <th> 
+                <p class="playerButton"> Test </p>
+                <p class="playerButton"> Test </p>
+            </th> </tr>
+        </table>
+    </div>
+
+    <script type="module">
+
+        const playerValue = getQueryParam('p');
+        var roomID = getQueryParam('r');
+
+        var playerSelected = -1;
+        const playerNames = [
+            "Test1",
+            "Test2",
+            "Test3",
+            "Test4",
+            "Test5",
+            "Test6",
+            "Test7",
+            "Test8",
+            "Test9",
+            "Test10",
+            "Test11",
+            "Test12"
+        ];
+
+        const buttonsDiv = document.getElementById("buttonsDiv");
+
+        // WEBSOCKET ////////////////////////////////////////////////////
+
+        const ws = new WebSocket("ws://localhost:8080");    // https://mystery-history-9d9aa246ca8c.herokuapp.com
+                                                            // ws://localhost:8080
+        ws.onopen = function() {
+            console.log("Connected to WebSocket server");
+            roomID = getQueryParam('r');
+            ws["room"] = roomID;
+            console.log(ws["room"]);
+            console.log(typeof(ws["room"]));
+
+            const message = { type: "connection", source: "HTML", pageIndex: 2, "roomID": roomID };
+            ws.send(JSON.stringify(message));
+        };
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+
+            switch (data.type) {
+                case ("getPlayerNames"):
+                    break;
+                // case ("redirect"):
+                //         window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
+                //         break;
+                default:
+                    console.log(data.type);
+                    break;
+            }
+        };
+
+        ws.onerror = function(error) {
+            console.error("WebSocket Error: " + error);
+        };
+
+        ws.onclose = function() {
+            console.log("WebSocket connection closed");
+        };
+
+        // OTHER ////////////////////////////////////////////////////////
+
+        function getQueryParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function createButtons() {
+
+            buttonsDiv.innerHTML = ``;
+            for (let i = 0; i < playerNames.length; i++) {
+                const newButton = document.createElement('article');
+                newButton.classList.add("playerButton");
+                newButton.innerHTML = `<p> ${playerNames[i]} </p>`;
+
+                newButton.addEventListener("click", (event) => { buttonPressed(i); });
+                
+                buttonsDiv.append(newButton);
+            }
+        }
+
+        function buttonPressed(index) {
+            console.log(index);
+        }
+
+        console.log("Player number: " + playerValue);
+        console.log("Room ID: " + roomID);
+
+        createButtons();
+
+    </script>
+</body>
+</html>

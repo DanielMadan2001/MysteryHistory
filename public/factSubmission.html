@@ -127,23 +127,6 @@
                     const rightSide = document.createElement('article');
                     rightSide.classList.add("factsItemDivRight");
                     rightSide.innerHTML = `<p> ${factsList[2 * i]} </p>`;
-
-                    // const rightSide = document.createElement('article');
-                    // rightSide.classList.add("factsItemDivRight");
-                    // rightSide.innerHTML = `<p> Test </p>`;
-
-                    // const xButton = document.createElement('article');
-                    // xButton.innerHTML = `<img src="images/x.png" class="factItemX" title="Delete fact">`;
-
-                    // xButton.addEventListener("click", (event) => {
-                    //     // console.log("bruh");
-                    //     factsList.splice(2 * i, 2);
-                    //     factsUpdate();
-                    // });
-                    
-                    // newDiv.append(xButton);
-                    // newDiv.innerHTML += `<p> ${factsList[2 * i]} </p>`;
-                
                     newDiv.append(leftSide);
                     newDiv.append(rightSide);
                     factsDiv.append(newDiv);
@@ -151,16 +134,23 @@
             }
             
             factsLeftTexts();
-        }
 
-        function newFactsButton(contents, difficulty) {
-            // const newExample = document.createElement('article');
+            if (ws.readyState === WebSocket.OPEN) {
+                const message = { type: "factsUpdate",  theRoomID: roomID, playerNum: playerValue, newFactsList: factsList };
+                ws.send(JSON.stringify(message));
+            }
         }
 
         function factsLeftTexts() {
             var easyFacts = 0;
             var medFacts = 0;
             var hardFacts = 0;
+
+            for (let i = 0; i < factsList.length / 2; i++) {
+                if (factsList[(2 * i) + 1] < 4)      { easyFacts++; }
+                else if (factsList[(2 * i) + 1] < 8) { medFacts++; }
+                else                                 { hardFacts++; }
+            }
 
             if (easyFacts < 3) {
                 var text = `Need at least `;
@@ -233,7 +223,7 @@
             if (factContents.value.length == 0 || currentDifficulty == -1) { return; }
 
             factsList.push(factContents.value);
-            factsList.push(currentDifficulty);
+            factsList.push(currentDifficulty + 1);
             factsUpdate();
 
             factContents.value = "";
