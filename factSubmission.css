@@ -84,7 +84,8 @@ body {
 }
 
 .difficultyButtonsChild {
-    min-width: 7.75%;
+    min-width: 7.5%;
+    max-width: 7.65%;
     margin: auto;
     float: left;
     border: 2px solid black;
