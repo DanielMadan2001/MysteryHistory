@@ -319,9 +319,13 @@
         factsUpdate();
         setDifficultyButtons();
         exampleFactsDiv.append(submissionExamples());
+        
+        
 
-        console.log("Player number: " + playerValue);
-        console.log("Room ID: " + roomID);
+        setInterval(function() {
+            const message = { type: "message", source: "HTML", messageString: "connected from HTML" };
+            ws.send(JSON.stringify(message));                
+        }, 1000);
     </script>
 </body>
 </html>

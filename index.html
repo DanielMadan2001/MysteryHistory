@@ -140,6 +140,11 @@
             }
 
             redTextToggle(false);
+
+            setInterval(function() {
+                const message = { type: "message", source: "HTML", messageString: "connected from HTML" };
+                ws.send(JSON.stringify(message));                
+            }, 1000);
         </script>
     </div>
 </body>
