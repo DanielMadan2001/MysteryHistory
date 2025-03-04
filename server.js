@@ -125,18 +125,7 @@ function joinRoom(ws, playerName, newID) {
             }
             rooms[key]["playerNames"].push(playerName);
             // rooms[key]["facts"][rooms[key]["players"].length] = [];
-            rooms[key]["facts"][rooms[key]["players"].length] = [
-                "A", 1,
-                "B", 2,
-                "C", 3,
-                "D", 4,
-                "E", 5,
-                "F", 6,
-                "G", 7,
-                "H", 8,
-                "I", 9,
-                "J", 10
-            ];
+            rooms[key]["facts"][rooms[key]["players"].length] = [];
             console.log(rooms);
             ws.send(JSON.stringify({ 
                 type: 'redirect', 
