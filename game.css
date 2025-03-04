@@ -1,3 +1,11 @@
+body {
+	/* background-image: url("images/bg0.png");
+    background-repeat: no-repeat;
+    background-attachment: fixed;  
+    background-size: cover; */
+    background-color: #d9d9d9;
+}
+
 p {
     padding-top: 5px;
     margin-bottom: 0px;

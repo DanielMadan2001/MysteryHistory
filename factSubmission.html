@@ -46,11 +46,11 @@
         const difficultyButtons = document.getElementById("difficultyButtons");
         document.getElementById("submitNewFact").onclick = function () { submitNewFact(); };
 
-        const playerValue = getQueryParam('p');
+        var playerValue = getQueryParam('p');
         var roomID = getQueryParam('r');
         
         var currentDifficulty = -1;
-        const factsList = [
+        var factsList = [
         ];
 
         // WEBSOCKET ////////////////////////////////////////////////////
@@ -61,11 +61,12 @@
         ws.onopen = function() {
             console.log("Connected to WebSocket server");
             roomID = getQueryParam('r');
+            playerValue = getQueryParam('p');
             ws["room"] = roomID;
             console.log(ws["room"]);
             console.log(typeof(ws["room"]));
 
-            const message = { type: "connection", source: "HTML", pageIndex: 1, "roomID": roomID };
+            const message = { type: "connection", source: "HTML", pageIndex: 1, "roomID": roomID, playerNum: playerValue };
             ws.send(JSON.stringify(message));
         };
 
@@ -73,9 +74,19 @@
             const data = JSON.parse(event.data);
 
             switch (data.type) {
+                case ("getFacts"):
+                    console.log(data.facts);
+                    factsList = data.factsList;
+                    factsUpdate();
+                    break;
                 case ("redirect"):
-                        window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
-                        break;
+                    if (data.useParams) {
+                        window.location.href = data.url + `?p=${encodeURIComponent(playerValue)}&r=${encodeURIComponent(roomID)}`;
+                    }
+                    else {
+                        window.location.href = data.url;
+                    }
+                    break;
                 default:
                     console.log(data.type);
                     break;
@@ -172,7 +183,7 @@
             }
             else { medFactsText.innerHTML = ``; }
 
-            if (hardFacts < 4) {
+            if (hardFacts < 3) {
                 var text = `Need at least `;
                 text += `<span style="color: #4B0087">${3 - hardFacts} more hard `;
                 if ((3 - hardFacts) == 1) { text += `fact`; }

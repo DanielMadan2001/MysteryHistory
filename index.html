@@ -12,6 +12,7 @@
     <div class="bodyDiv">
         <h1> MYSTERY HISTORY </h1>
         <h2> Made by  <a href = "https://danielmadan2001.github.io/" target="_blank">Daniel Madan</a> </h2>
+        <h3> With help from <a href = "https://www.linkedin.com/in/rebecca-de-venezia/" target="_blank">Rebecca De Venezia</a> </h3>
         <div style="width: 30%; margin-left: 20%; float: left;">
             <input id="playerName" placeholder="Name" type="text" style="width: 90%;"> </input>
         </div>
@@ -84,6 +85,12 @@
                     case ("toggleRedText"):
                         redTextToggle(true);
                         break;
+                    case ("fullServer"):
+                        redTextToggle(false, true);
+                        break;
+                    case ("canJoinFalse"):
+                        redTextToggle(false, false, true);
+                        break;
                     case ("redirect"):
                         window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
                         break;
@@ -114,9 +121,11 @@
                 ws.send(JSON.stringify(message));
             }
 
-            function redTextToggle(on) {
-                if (on) { redTextDiv.innerHTML = `<p> No server with this ID could be found </p>`; }
-                else    { redTextDiv.innerHTML = ``; }
+            function redTextToggle(on, serverFull = false, canJoinFalse = false) {
+                if (on)                 { redTextDiv.innerHTML = `<p> No server with this ID could be found </p>`; }
+                else if (serverFull)    { redTextDiv.innerHTML = `<p> Server is full </p>`; }
+                else if (canJoinFalse)  { redTextDiv.innerHTML = `<p> Game is already in session </p>`; }
+                else                    { redTextDiv.innerHTML = ``; }
             }
 
             function unityScreenshotClick(index) {

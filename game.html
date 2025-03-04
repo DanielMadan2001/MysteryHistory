@@ -29,22 +29,10 @@
         var roomID = getQueryParam('r');
 
         var playerSelected = -1;
-        const playerNames = [
-            "Test1",
-            "Test2",
-            "Test3",
-            "Test4",
-            "Test5",
-            "Test6",
-            "Test7",
-            "Test8",
-            "Test9",
-            "Test10",
-            "Test11",
-            "Test12"
-        ];
+        var playerNames = [];
 
         const buttonsDiv = document.getElementById("buttonsDiv");
+        const buttonObjects = [];
 
         // WEBSOCKET ////////////////////////////////////////////////////
 
@@ -55,23 +43,34 @@
             roomID = getQueryParam('r');
             ws["room"] = roomID;
             console.log(ws["room"]);
-            console.log(typeof(ws["room"]));
-
-            const message = { type: "connection", source: "HTML", pageIndex: 2, "roomID": roomID };
+            const message = { type: "connection", source: "HTML", pageIndex: 2, roomID: roomID, playerNum: playerValue, websocket: ws };
             ws.send(JSON.stringify(message));
         };
 
         ws.onmessage = function(event) {
             const data = JSON.parse(event.data);
+            console.log(data);
 
             switch (data.type) {
                 case ("getPlayerNames"):
+                    playerNames = data.playerNames;
+                    console.log("player names: " + playerNames);
+                    createButtons();
                     break;
-                // case ("redirect"):
-                //         window.location.href = data.url + `?p=${encodeURIComponent(data.playerNumber)}&r=${encodeURIComponent(data.roomID)}`;
-                //         break;
+                case ("newRound"):
+                    playerSelected = -1;
+                    updateButtons();
+                    break;
+                case ("redirect"):
+                    if (data.useParams) {
+                        window.location.href = data.url + `?p=${encodeURIComponent(playerValue)}&r=${encodeURIComponent(roomID)}`;
+                    }
+                    else {
+                        window.location.href = data.url;
+                    }                    break;
                 default:
-                    console.log(data.type);
+                    console.log("got message of type: " + data.type);
+                    console.log(data);
                     break;
             }
         };
@@ -92,21 +91,42 @@
         }
 
         function createButtons() {
-
             buttonsDiv.innerHTML = ``;
             for (let i = 0; i < playerNames.length; i++) {
                 const newButton = document.createElement('article');
                 newButton.classList.add("playerButton");
                 newButton.innerHTML = `<p> ${playerNames[i]} </p>`;
 
-                newButton.addEventListener("click", (event) => { buttonPressed(i); });
+                newButton.addEventListener("click", (event) => { 
+                    buttonPressed(i); 
+                });
                 
                 buttonsDiv.append(newButton);
+                buttonObjects.push(newButton);
             }
+            console.log(buttonObjects);
+            playerSelected = -1;
+            updateButtons();
         }
 
         function buttonPressed(index) {
-            console.log(index);
+            playerSelected = index;
+            updateButtons();
+
+            const message = { type: "quizButton",  theRoomID: roomID, playerNum: playerValue, buttonIndex: index };
+            ws.send(JSON.stringify(message));
+        }
+
+        function updateButtons() {
+            console.log(playerSelected);
+            for (let i = 0; i < playerNames.length; i++) {
+                if (i == playerSelected) {
+                    buttonObjects[i].style.backgroundColor = "red";
+                }
+                else {
+                    buttonObjects[i].style.backgroundColor = "white";
+                }
+            }
         }
 
         console.log("Player number: " + playerValue);
