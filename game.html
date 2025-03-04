@@ -32,7 +32,6 @@
         var playerNames = [];
 
         const buttonsDiv = document.getElementById("buttonsDiv");
-        const buttonObjects = [];
 
         // WEBSOCKET ////////////////////////////////////////////////////
 
@@ -58,6 +57,7 @@
                     createButtons();
                     break;
                 case ("newRound"):
+                    console.log("message newRound");
                     playerSelected = -1;
                     updateButtons();
                     break;
@@ -67,7 +67,8 @@
                     }
                     else {
                         window.location.href = data.url;
-                    }                    break;
+                    }       
+                    break;
                 default:
                     console.log("got message of type: " + data.type);
                     console.log(data);
@@ -95,6 +96,7 @@
             for (let i = 0; i < playerNames.length; i++) {
                 const newButton = document.createElement('article');
                 newButton.classList.add("playerButton");
+                newButton.setAttribute('id', "button" + i.toString());
                 newButton.innerHTML = `<p> ${playerNames[i]} </p>`;
 
                 newButton.addEventListener("click", (event) => { 
@@ -102,9 +104,7 @@
                 });
                 
                 buttonsDiv.append(newButton);
-                buttonObjects.push(newButton);
             }
-            console.log(buttonObjects);
             playerSelected = -1;
             updateButtons();
         }
@@ -121,10 +121,10 @@
             console.log(playerSelected);
             for (let i = 0; i < playerNames.length; i++) {
                 if (i == playerSelected) {
-                    buttonObjects[i].style.backgroundColor = "red";
+                    document.getElementById("button" + i.toString()).style.backgroundColor = "red";
                 }
                 else {
-                    buttonObjects[i].style.backgroundColor = "white";
+                    document.getElementById("button" + i.toString()).style.backgroundColor = "white";
                 }
             }
         }

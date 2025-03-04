@@ -69,12 +69,10 @@ wss.on('connection', (ws) => {
                 break;
                 // updateRoomState(parsedMessage.roomID, false, false, false); 
                 break;
-            case ("startQuiz"):
-                updateRoomState(parsedMessage.roomID, false, false, true);
-                break;
+            case ("startQuiz"):             updateRoomState(parsedMessage.roomID, false, false, true);  break;
             case ("factsUpdate"):           updateFactsList(ws, parsedMessage.theRoomID, parsedMessage.playerNum, parsedMessage.newFactsList); break;
             case ("quizButton"):            quizButton(parsedMessage.theRoomID, parsedMessage.playerNum, parsedMessage.buttonIndex);
-            case ("quizNewRound"):          quizNewRound(parsedMessage.theRoomID); break;                
+            case ("quizNewRound"):          console.log(rooms[parsedMessage.theRoomID]["players"]); quizNewRound(parsedMessage.theRoomID); break;                
             default:
                 console.log("Got message of type: " + parsedMessage.type);
                 break;
@@ -211,6 +209,7 @@ function quizButton(theRoomID, playerNum, buttonIndex) {
 }
 
 function quizNewRound(theRoomID) {
+    console.log("do quiz new round");
     rooms[theRoomID]["players"].forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
             client.send(JSON.stringify({ type: 'newRound' }));
